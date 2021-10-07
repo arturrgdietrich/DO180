@@ -1,0 +1,22 @@
+FROM ubi8/ubi:8.3
+
+MAINTAINER artur dietrich <artur@ovd.com.br>
+
+ENV PORT 8080
+
+RUN yum -y install httpd && yum clean all
+
+RUN sed -ri -e "/^Listen 80/c\Listen ${PORT}" /etc/httpd/conf/httpd.conf && \
+    chown -R apache:apache /etc/httpd/logs/ && \
+    chown -R apache:apache /run/httpd/
+
+EXPOSE ${PORT}
+
+COPY ./src/ /var/www/html/
+
+USER apache
+
+#ENTRYPOINT ["/usr/sbin/httpd"]
+
+CMD ["httpd","-D", "FOREGROUND"]
+
